@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Contents/Cameleon.unity
+    guid: 083d5c2bee02b417d8de25a7c148d53a
+  - enabled: 0
+    path: Assets/Scenes/Contents/Fire.unity
+    guid: 00c5e047b35014e819b86d3fd0bd9e34
+  - enabled: 0
+    path: Assets/Scenes/Contents/Arrow.unity
+    guid: be2d240319482497eb2ac7feb5be96b2
+  - enabled: 0
+    path: Assets/Scenes/Marble.unity
+    guid: b85b7144698c64bf3bb4fb92bef59ab7
+  - enabled: 0
+    path: Assets/Scenes/Contents/Yoyo.unity
+    guid: 34f5dd5733a2e455da6ab8e4ef608b2c
+  - enabled: 0
+    path: Assets/Scenes/Contents/Pipe.unity
+    guid: 91e2136241efc4f3c9ec2f3ff9b6208e
+  m_configObjects: {}
