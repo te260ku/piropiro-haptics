@@ -10,21 +10,17 @@ const int serverPort = 22224;  // espのポート番号
 
 WiFiUDP udp;
 
-
-boolean sendFlag = false;
-
 byte recvbuf[1024];
 byte sendbuf[1024];
 
-int recvbuf_size = 3;
-int sendbuf_size = 1;
+int recvbufSize = 3;
+int sendbufSize = 1;
 
 int c = 0;
-float ans = 0;
-float dist1;
-float dist2;
-float Vcc = 5.0;
+float val = 0;
 
+// 2バイト以上のデータタイプはビットシフトしてバイト分割して送る
+// floatは共用体を利用して送る
 typedef union {
   float val;
   byte binary[4];
@@ -32,17 +28,13 @@ typedef union {
 
 union Position
 {
-    struct {
-        float x;
-        float y;
-        float z;
-    };
-    uint8_t bin[sizeof(float) * 3]; // -> 4 * 3 = 12
+  struct {
+      float x;
+      float y;
+      float z;
+  };
+  uint8_t bin[sizeof(float) * 3];
 };
-
-
-
-
 
 
 void setup() {
@@ -66,7 +58,7 @@ void setup() {
 void receiveUDP(){
   int packetSize = udp.parsePacket();
   if (packetSize > 0) {
-    int getsize = udp.read(recvbuf, recvbuf_size);
+    int getsize = udp.read(recvbuf, recvbufSize);
     Serial.print(recvbuf[0], HEX);
     Serial.print(recvbuf[1], HEX);
     Serial.print(recvbuf[2], HEX);
@@ -74,48 +66,41 @@ void receiveUDP(){
   }
 }
 
-void sendUDP(){
-  //２バイト以上のデータタイプはビットシフトしてバイト分割して送る
-  //float は共用体を利用して送る
-  if (sendFlag) {
-    udp.beginPacket(clientAddress, clientPort);
-    udp.write(sendbuf, sendbuf_size);
-    udp.endPacket();
-    Serial.println("send");
-    sendFlag = false;
-  }
+void sendUDP (byte buf[]) {
+  udp.beginPacket(clientAddress, clientPort);
+  udp.write(buf, sendbufSize);
+  udp.endPacket();
+  Serial.println("send");
 }
 
 int getDistance() {
+  // 平均を取る
   for (int i=0 ; i<1000; i++) {
-      ans  = ans + analogRead(A6);
+      val += analogRead(A6);
   }
-  int dist1 = 1950114 * pow(ans/1000, -1.256676);
-  if (dist1 > 255) {
-    dist1 = 255;
+  // 補正式
+  int dist = 1950114 * pow(val/1000, -1.256676);
+  // 最大値を固定
+  if (dist > 255) {
+    dist = 255;
   }
-  return dist1
+  return dist;
 }
 
  
 void loop() {
-
   // 1秒に1回実行
   if (c >= 10) {
-    
-    ans = 0;
-
+    val = 0;
     int dist = getDistance();
     sendbuf[0] = dist;
 
-    sendUDP();
+    sendUDP(sendbuf);
 
     c = 0;
-    sendFlag = true;
   }
   
-
   delay(100);
   c++;
-  
+
 }
